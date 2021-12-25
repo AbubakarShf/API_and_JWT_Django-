@@ -1,14 +1,34 @@
 from functools import partial
+from django.contrib.auth.models import User
 from django.shortcuts import render
-from .Serializer import StudentSerializer
+from .Serializer import StudentSerializer, UserSerializer
 from .models import *
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
-
 from rest_framework.views import APIView
+from rest_framework.authentication import TokenAuthentication
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.authtoken.models import Token
+from rest_framework_simplejwt.authentication import JWTAuthentication
+
+
+
+
+class RegisterUser(APIView):
+    def post(self,request):
+        serializer=UserSerializer(data=request.data)
+        if not serializer.is_valid():
+            return Response({"status":403,"Errors":serializer.errors,"Message":"Something went wrong!"})
+        serializer.save()
+        user=User.objects.get(username=serializer.data['username'])
+        token_obj,_=Token.objects.get_or_create(user=user)
+        return Response({"status":200,"payload": serializer.data,"token":str(token_obj),"Message":"You send this!"})
+
 
 
 class StudentAPI(APIView):
+    authentication_classes=[TokenAuthentication]
+    permission_classes=[IsAuthenticated]
     def get(self,request):
         student_Obj=Student.objects.all()
         serializer=StudentSerializer(student_Obj,many=True)
