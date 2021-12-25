@@ -28,14 +28,14 @@ class RegisterUser(APIView):
         return Response({"status":200,"payload": serializer.data,'refresh': str(refresh),
         'access': str(refresh.access_token),"Message":"You send this!"})
 
-class LogoutUser(APIView):
-    def post(self,request):
-        response=Response()
-        Flag=response.delete_cookie('jwt')
-        print(Flag)
-        return Response({
-            'message':"User Logout Successfully!"
-        })
+# class LogoutUser(APIView):
+#     def post(self,request):
+#         response=Response()
+#         Flag=response.delete_cookie('jwt')
+#         print(Flag)
+#         return Response({
+#             'message':"User Logout Successfully!"
+#         })
 class LogoutAllView(APIView):
     permission_classes = (IsAuthenticated,)
 

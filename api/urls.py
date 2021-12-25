@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.urls import path,include
 from api import views
-from .views import StudentAPI,RegisterUser,LogoutUser,LogoutAllView
+from .views import StudentAPI,RegisterUser,LogoutAllView
 from rest_framework.authtoken import views
 from rest_framework_simplejwt.views import (
     TokenObtainPairView,
@@ -15,7 +15,7 @@ urlpatterns = [
 
     path('student/',StudentAPI.as_view()),
     path('register/',RegisterUser.as_view()),
-    path('logout/',LogoutUser.as_view()),
+    path('logout/',LogoutAllView.as_view()),
     # path('api-token-auth/', views.obtain_auth_token),
     path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
