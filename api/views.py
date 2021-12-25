@@ -1,5 +1,6 @@
 from functools import partial
 from django.contrib.auth.models import User
+from django.core.checks import messages
 from django.http import response
 from django.shortcuts import render
 from .Serializer import StudentSerializer, UserSerializer
@@ -11,7 +12,7 @@ from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.authtoken.models import Token
 from rest_framework_simplejwt.authentication import JWTAuthentication
-from rest_framework_simplejwt.tokens import RefreshToken
+from rest_framework_simplejwt.tokens import RefreshToken,OutstandingToken,BlacklistedToken
 
 
 
@@ -30,11 +31,20 @@ class RegisterUser(APIView):
 class LogoutUser(APIView):
     def post(self,request):
         response=Response()
-        response.delete_cookie('jwt')
+        Flag=response.delete_cookie('jwt')
+        print(Flag)
         return Response({
             'message':"User Logout Successfully!"
         })
+class LogoutAllView(APIView):
+    permission_classes = (IsAuthenticated,)
 
+    def post(self, request):
+        tokens = OutstandingToken.objects.filter(id=request.data['id'])
+        for token in tokens:
+            t, _ = BlacklistedToken.objects.get_or_create(token=token)
+        print(t)
+        return Response({messages:"lOGOUT ALL DONE"})
 
 class StudentAPI(APIView):
     authentication_classes=[JWTAuthentication]

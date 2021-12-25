@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.urls import path,include
 from api import views
-from .views import StudentAPI,RegisterUser,LogoutUser
+from .views import StudentAPI,RegisterUser,LogoutUser,LogoutAllView
 from rest_framework.authtoken import views
 from rest_framework_simplejwt.views import (
     TokenObtainPairView,
