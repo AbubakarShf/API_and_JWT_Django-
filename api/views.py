@@ -1,5 +1,6 @@
 from functools import partial
 from django.contrib.auth.models import User
+from django.http import response
 from django.shortcuts import render
 from .Serializer import StudentSerializer, UserSerializer
 from .models import *
@@ -10,7 +11,7 @@ from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.authtoken.models import Token
 from rest_framework_simplejwt.authentication import JWTAuthentication
-
+from rest_framework_simplejwt.tokens import RefreshToken
 
 
 
@@ -21,13 +22,22 @@ class RegisterUser(APIView):
             return Response({"status":403,"Errors":serializer.errors,"Message":"Something went wrong!"})
         serializer.save()
         user=User.objects.get(username=serializer.data['username'])
-        token_obj,_=Token.objects.get_or_create(user=user)
-        return Response({"status":200,"payload": serializer.data,"token":str(token_obj),"Message":"You send this!"})
+        refresh = RefreshToken.for_user(user)
+        # token_obj,_=Token.objects.get_or_create(user=user)
+        return Response({"status":200,"payload": serializer.data,'refresh': str(refresh),
+        'access': str(refresh.access_token),"Message":"You send this!"})
 
+class LogoutUser(APIView):
+    def post(self,request):
+        response=Response()
+        response.delete_cookie('jwt')
+        return Response({
+            'message':"User Logout Successfully!"
+        })
 
 
 class StudentAPI(APIView):
-    authentication_classes=[TokenAuthentication]
+    authentication_classes=[JWTAuthentication]
     permission_classes=[IsAuthenticated]
     def get(self,request):
         student_Obj=Student.objects.all()
